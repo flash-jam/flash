@@ -1,4 +1,4 @@
-# turbo-test
+# app-db
 
 To install dependencies:
 

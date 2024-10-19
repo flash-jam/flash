@@ -1,0 +1,44 @@
+{
+  "name": "@flash/server",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    "./types": {
+      "types": "./src/exports/types.ts",
+      "default": "./dist/exports/types.js"
+    },
+    ".": {
+      "types": "./src/exports/client.ts",
+      "default": "./dist/exports/client.js"
+    }
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "dev:tsc": "tsc --watch",
+    "deploy": "wrangler deploy --minify",
+    "check-types": "tsc",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@hono/clerk-auth": "^2.0.0",
+    "@hono/zod-openapi": "^0.16.4",
+    "@hono/zod-validator": "^0.4.1",
+    "@scalar/hono-api-reference": "^0.5.155",
+    "@flash/db": "workspace:*",
+    "hono": "^4.6.5",
+    "hono-pino": "^0.3.0",
+    "pino": "^9.5.0",
+    "pino-pretty": "^11.3.0",
+    "stoker": "^1.2.7",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240925.0",
+    "wrangler": "^3.79.0",
+    "@flash/typescript-config": "workspace:*"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

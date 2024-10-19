@@ -1,0 +1,15 @@
+{
+  "extends": "@flash/typescript-config/base.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleDetection": "force",
+    "lib": ["ESNext"],
+    "types": ["@cloudflare/workers-types/2023-07-01"],
+    "jsxImportSource": "hono/jsx",
+    "outDir": "dist",
+    "verbatimModuleSyntax": true
+  },
+  "include": ["src"],
+  "exclude": [".wrangler", "node_modules"]
+}
