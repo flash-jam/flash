@@ -5,8 +5,8 @@ import { createRouter } from "../../lib/create-app";
 const answers = createRouter()
   .openapi(routes.saveAnswer, handlers.saveAnswers)
   .openapi(routes.getAnswers, handlers.getAnswers)
-  .openapi(routes.getAnswer, handlers.getAnswer)
   .openapi(routes.recentAnswers, handlers.recentAnswers)
-  .openapi(routes.stats, handlers.stats);
+  .openapi(routes.stats, handlers.stats)
+  .openapi(routes.getAnswer, handlers.getAnswer);
 
 export default answers;

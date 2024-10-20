@@ -6,16 +6,16 @@
   "exports": {
     "./types": {
       "types": "./src/exports/types.ts",
-      "default": "./dist/exports/types.js"
+      "default": "./dist/src/exports/types.js"
     },
     ".": {
       "types": "./src/exports/client.ts",
-      "default": "./dist/exports/client.js"
+      "default": "./dist/src/exports/client.js"
     }
   },
   "scripts": {
     "dev": "wrangler dev",
-    "dev:tsc": "tsc --watch",
+    "watch": "tsc --watch",
     "deploy": "wrangler deploy --minify",
     "check-types": "tsc",
     "build": "tsc"

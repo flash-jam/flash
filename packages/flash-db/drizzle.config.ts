@@ -3,6 +3,8 @@ import { getEnv } from "./env";
 
 const env = getEnv(process.env);
 
+console.log({ env });
+
 export default defineConfig({
   schema: "./src/schema/*",
   out: "./src/migrations",

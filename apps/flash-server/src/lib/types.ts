@@ -1,11 +1,12 @@
 import type { OpenAPIHono, RouteConfig, RouteHandler } from "@hono/zod-openapi";
 import type { Environment } from "../env";
+import type { PinoLogger } from "hono-pino";
 
 export type PrintFunc = (str: string, ...rest: string[]) => void;
 
 export interface AppBindings {
   Variables: {
-    logger: PrintFunc;
+    logger: PinoLogger;
   };
   Bindings: Environment;
 }

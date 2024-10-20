@@ -3,10 +3,10 @@
   "packageManager": "bun@1.1.30",
   "private": true,
   "scripts": {
-    "all:up": "concurrently \"bun run --filter '*' db\" \"bun run --filter '*' watch\" \"bun run --filter '*' dev\"",
-    "db:up": "concurrently \"bun run --filter '*' db\" \"bun run --filter '*' watch\"",
-    "server:up": "bun run --filter @flash/server dev",
-    "web:up": "bun run --filter @flash/web dev"
+    "build": "bun run --filter=@flash/db build && bun run --filter=@flash/server build && bun run --filter=@flash/web build",
+    "copy": "rm -rf apps/flash-server/public/* && cp -rf apps/flash-web/dist/* apps/flash-server/public",
+    "deploy:server": "bun run --filter=@flash/server deploy",
+    "deploy": "bun run build && bun run copy && bun run deploy:server"
   },
   "workspaces": [
     "apps/*",

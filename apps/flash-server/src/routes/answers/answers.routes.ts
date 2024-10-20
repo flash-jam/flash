@@ -6,9 +6,10 @@ import { createErrorSchema, IdParamsSchema } from "stoker/openapi/schemas";
 import { z } from "zod";
 import { auth } from "../../middlewares/auth";
 import { notFoundSchema, unauthorizedSchema } from "../../lib/constants";
+import type { MiddlewareHandler } from "hono";
 
 const tags = ["Answers"];
-const middleware = [auth()];
+const middleware: MiddlewareHandler[] = [auth()];
 
 const saveAnswerRequestSchema = insertAnswerSchema.pick({
   left: true,
@@ -107,7 +108,7 @@ const statsSchema = z.object({
   dataPoints: z.array(dataPointSchema),
 });
 const statsRequestSchema = z.object({
-  range: z.enum(["month", "six-months", "yea", "all-time"]),
+  range: z.enum(["month", "six-months", "yea", "all-time"]).optional(),
 });
 export const stats = createRoute({
   tags,

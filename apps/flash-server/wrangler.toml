@@ -1,7 +1,9 @@
-name = "app-server"
+name = "flash-jam"
 main = "src/index.ts"
 compatibility_date = "2024-10-18"
 compatibility_flags = [ "nodejs_compat" ]
+
+assets = { directory = "public" }
 
 # [vars]
 # MY_VAR = "my-variable"
