@@ -1,8 +1,14 @@
-import { DbService } from "@flash/db";
-import type { Environment } from "../env";
+import type { AppBindings } from "./types";
+import type { Context } from "hono";
 
-export function getDb(env: Environment) {
-  const db = new DbService(env.DATABASE_URL, env.DATABASE_AUTH_TOKEN);
+export function getAnswersDb(c: Context<AppBindings>) {
+  return c.var.dbConfig.createAnswersDbService();
+}
 
-  return db;
+export function getProfilesDb(c: Context<AppBindings>) {
+  return c.var.dbConfig.createProfilesDbService();
+}
+
+export function getScoresDb(c: Context<AppBindings>) {
+  return c.var.dbConfig.createScoresDbService();
 }

@@ -1,6 +1,8 @@
 import type { Answer } from "@flash/db/types";
 
-export function calculate(answer: Answer) {
+export type CalcAnswer = Pick<Answer, "left" | "right" | "operation" | "entry">;
+
+export function calculate(answer: CalcAnswer) {
   switch (answer.operation) {
     case "addition":
       return answer.left + answer.right;
@@ -15,6 +17,6 @@ export function calculate(answer: Answer) {
   }
 }
 
-export const isCorrect = (answer: Answer) => {
+export const isCorrect = (answer: CalcAnswer) => {
   return answer.entry === calculate(answer);
 };

@@ -8,6 +8,7 @@ import defaultHook from "stoker/openapi/default-hook";
 import type { AppBindings, AppOpenAPI } from "./types";
 import { getEnv } from "../env";
 import { pinoLogger } from "../middlewares/pino-logger";
+import { LibSqlDbConfig } from "@flash/db";
 
 export function createRouter() {
   return new OpenAPIHono<AppBindings>({
@@ -19,9 +20,18 @@ export function createRouter() {
 export default function createApp() {
   const app = createRouter();
 
-  app.use((c, next) => {
+  app.use(async (c, next) => {
     c.env = getEnv(c.env);
-    return next();
+    await next();
+  });
+
+  app.use(async (c, next) => {
+    c.set(
+      "dbConfig",
+      new LibSqlDbConfig(c.env.DATABASE_URL, c.env.DATABASE_AUTH_TOKEN),
+    );
+
+    await next();
   });
 
   app.use(serveEmojiFavicon("⚡"));

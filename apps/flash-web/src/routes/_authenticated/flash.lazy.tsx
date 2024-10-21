@@ -14,15 +14,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
-import { CaretSortIcon } from "@radix-ui/react-icons";
-import { createLazyFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { CheckCircle, RotateCcw, XCircle } from "lucide-react";
-import { useFlash } from "@/lib/flash";
-import { Operation } from "@flash/db/types";
 import { useRecentAnswers, useSaveAnswer } from "@/lib/api/answers";
+import { useProfile } from "@/lib/api/profiles";
+import { useResetScore, useScore } from "@/lib/api/scores";
+import { useFlash } from "@/lib/flash";
+import { cn } from "@/lib/utils";
+import { Operation, Profile, Score } from "@flash/db/types";
+import { CaretSortIcon, ResetIcon } from "@radix-ui/react-icons";
+import { createLazyFileRoute } from "@tanstack/react-router";
+import { CheckCircle, RotateCcw, XCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 import { calculate } from "../../../../flash-server/src/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export const Route = createLazyFileRoute("/_authenticated/flash")({
   component: Flash,
@@ -118,6 +121,8 @@ function FlashCard({ op }: { op: Op }) {
   const [status, setStatus] = useState<string>("");
   const [entry, setEntry] = useState("");
   const saveAnswer = useSaveAnswer();
+  const profile = useProfile();
+  const score = useScore();
 
   function correct() {
     setStatus(
@@ -136,7 +141,7 @@ function FlashCard({ op }: { op: Op }) {
     return () => clearTimeout(timeoutId);
   }, [status]);
 
-  function checkAnswer(answer: number) {
+  async function checkAnswer(answer: number) {
     if (answer === flash.answer) {
       correct();
       console.log("entry:", { answer });
@@ -162,7 +167,7 @@ function FlashCard({ op }: { op: Op }) {
     }
 
     incorrect();
-    saveAnswer.mutate(
+    await saveAnswer.mutateAsync(
       {
         entry: answer,
         left: flash.left,
@@ -180,6 +185,18 @@ function FlashCard({ op }: { op: Op }) {
 
   return (
     <div className="grid grid-flow-row auto-rows-max md:grid-flow-col md:auto-cols-auto gap-2 place-items-center m-auto">
+      <div className="col-span-2">
+        {profile.isLoading ||
+        profile.isPending ||
+        profile.isFetching ||
+        score.isLoading ||
+        score.isPending ||
+        score.isFetching ? (
+          <span>"Loading..."</span>
+        ) : (
+          <ScoreDisplay profile={profile.data!} score={score.data!} />
+        )}
+      </div>
       <div className="relative">
         <div className={cn("absolute", "h-full", "w-full", status)}></div>
         <Card className="relative z-10 w-80 dark:bg-white dark:text-background">
@@ -256,6 +273,29 @@ function RecentAnswers() {
             </TableBody>
           </Table>
         )}
+      </div>
+    </div>
+  );
+}
+
+function ScoreDisplay({ profile, score }: { profile: Profile; score: Score }) {
+  const resetScore = useResetScore();
+
+  return (
+    <div className="flex flex-col">
+      <div>
+        <em>Level:</em> {profile.level}
+      </div>
+      <div className="flex align-middle items-center gap-2">
+        <div>
+          <em>Score:</em> {score.score}
+        </div>
+        <div>
+          <Button variant="ghost" size="sm" onClick={() => resetScore.mutate()}>
+            Reset score
+            <ResetIcon aria-describedby="Reset" />
+          </Button>
+        </div>
       </div>
     </div>
   );

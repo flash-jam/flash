@@ -2,7 +2,7 @@ import * as HTTPStatusCodes from "stoker/http-status-codes";
 import * as HTTPStatusPhrases from "stoker/http-status-phrases";
 import type { z } from "zod";
 import type { AppRouteHandler } from "../../lib/types";
-import { getDb } from "../../lib/get-db";
+import { getAnswersDb, getProfilesDb, getScoresDb } from "../../lib/get-db";
 import { getValidAuth } from "../../lib/get-valid-auth";
 import type {
   dataPointSchema,
@@ -13,18 +13,28 @@ import type {
   StatsRoute,
 } from "./answers.routes";
 import { isCorrect } from "../../lib/utils";
+import { LEVEL_RATE, SCORE_RATE } from "../../lib/constants";
 
 export const saveAnswers: AppRouteHandler<SaveAnswerRoute> = async (c) => {
   const answerRequest = c.req.valid("json");
-  const db = getDb(c.env);
-  const auth = getValidAuth(c);
+  const answers = getAnswersDb(c);
+  const scores = getScoresDb(c);
+  const profiles = getProfilesDb(c);
+  const { userId } = getValidAuth(c);
 
-  const answer = await db.saveAnswer(answerRequest, auth.userId);
+  const answer = await answers.saveAnswer(answerRequest, userId);
+  if (isCorrect(answer)) {
+    const profile = await profiles.getOrCreateProfile(userId);
+    const score = await scores.addScore(SCORE_RATE, profile.id);
+    if (score.score >= profile.level * LEVEL_RATE) {
+      await profiles.saveProfile(profile.id, { level: profile.level + 1 });
+    }
+  }
   return c.json(answer, HTTPStatusCodes.OK);
 };
 
 export const getAnswers: AppRouteHandler<GetAnswersRoute> = async (c) => {
-  const db = getDb(c.env);
+  const db = getAnswersDb(c);
   const { userId } = getValidAuth(c);
 
   const results = await db.getAnswers(userId);
@@ -34,7 +44,7 @@ export const getAnswers: AppRouteHandler<GetAnswersRoute> = async (c) => {
 
 export const getAnswer: AppRouteHandler<GetAnswerRotue> = async (c) => {
   const { id } = c.req.valid("param");
-  const db = getDb(c.env);
+  const db = getAnswersDb(c);
   const { userId } = getValidAuth(c);
 
   const answer = await db.getAnswer(userId, id);
@@ -49,7 +59,7 @@ export const getAnswer: AppRouteHandler<GetAnswerRotue> = async (c) => {
 };
 
 export const recentAnswers: AppRouteHandler<RecentAnswersRotue> = async (c) => {
-  const db = getDb(c.env);
+  const db = getAnswersDb(c);
   const { userId } = getValidAuth(c);
 
   const results = await db.getRecentAnswers(userId, 20);
@@ -66,7 +76,7 @@ type DataPoint = z.infer<typeof dataPointSchema>;
 
 export const stats: AppRouteHandler<StatsRoute> = async (c) => {
   const query = c.req.query();
-  const db = getDb(c.env);
+  const db = getAnswersDb(c);
   const { userId } = getValidAuth(c);
 
   const range =

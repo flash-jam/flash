@@ -44,6 +44,12 @@ export function useSaveAnswer() {
       queryClient.invalidateQueries({
         queryKey: ["get-recent-answers"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["get-score"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["get-profile"],
+      });
     },
   });
 }

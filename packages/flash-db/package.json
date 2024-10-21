@@ -18,8 +18,7 @@
     "db:migrate": "drizzle-kit migrate",
     "watch": "tsc --watch",
     "build": "tsc",
-    "check-types": "tsc",
-    "db:up": "concurrently \"bun run db\" \"bun run watch\""
+    "check-types": "tsc"
   },
   "devDependencies": {
     "@flash/typescript-config": "workspace:*",
