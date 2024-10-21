@@ -2,7 +2,7 @@ import * as HTTPStatusCodes from "stoker/http-status-codes";
 import * as HTTPStatusPhrases from "stoker/http-status-phrases";
 import type { z } from "zod";
 import type { AppRouteHandler } from "../../lib/types";
-import { getAnswersDb } from "../../lib/get-db";
+import { getAnswersDb, getProfilesDb, getScoresDb } from "../../lib/get-db";
 import { getValidAuth } from "../../lib/get-valid-auth";
 import type {
   dataPointSchema,
@@ -13,13 +13,23 @@ import type {
   StatsRoute,
 } from "./answers.routes";
 import { isCorrect } from "../../lib/utils";
+import { LEVEL_RATE, SCORE_RATE } from "../../lib/constants";
 
 export const saveAnswers: AppRouteHandler<SaveAnswerRoute> = async (c) => {
   const answerRequest = c.req.valid("json");
-  const db = getAnswersDb(c);
-  const auth = getValidAuth(c);
+  const answers = getAnswersDb(c);
+  const scores = getScoresDb(c);
+  const profiles = getProfilesDb(c);
+  const { userId } = getValidAuth(c);
 
-  const answer = await db.saveAnswer(answerRequest, auth.userId);
+  const answer = await answers.saveAnswer(answerRequest, userId);
+  if (isCorrect(answer)) {
+    const profile = await profiles.getOrCreateProfile(userId);
+    const score = await scores.addScore(SCORE_RATE, profile.id);
+    if (score.score >= profile.level * LEVEL_RATE) {
+      await profiles.saveProfile(profile.id, { level: profile.level + 1 });
+    }
+  }
   return c.json(answer, HTTPStatusCodes.OK);
 };
 
@@ -42,7 +52,7 @@ export const getAnswer: AppRouteHandler<GetAnswerRotue> = async (c) => {
   if (!answer)
     return c.json(
       { message: HTTPStatusPhrases.NOT_FOUND },
-      HTTPStatusCodes.NOT_FOUND,
+      HTTPStatusCodes.NOT_FOUND
     );
 
   return c.json(answer, HTTPStatusCodes.OK);
@@ -92,7 +102,7 @@ export const stats: AppRouteHandler<StatsRoute> = async (c) => {
   if (formatOptions) {
     const dataPoints = results.reduce((list, a) => {
       let dataPoint = list.find(
-        (d) => d.key === a.createdAt.toLocaleString("en-US", formatOptions),
+        (d) => d.key === a.createdAt.toLocaleString("en-US", formatOptions)
       );
       if (!dataPoint) {
         const correct = isCorrect(a);
@@ -125,6 +135,6 @@ export const stats: AppRouteHandler<StatsRoute> = async (c) => {
         },
       ],
     },
-    HTTPStatusCodes.OK,
+    HTTPStatusCodes.OK
   );
 };

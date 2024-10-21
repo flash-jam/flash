@@ -5,4 +5,6 @@ import * as handlers from "./scores.handlers";
 export const scores = createRouter()
   .openapi(routes.createScore, handlers.createScore)
   .openapi(routes.getScoreForUser, handlers.getScoreForUser)
-  .openapi(routes.createScore, handlers.createScore);
+  .openapi(routes.saveScore, handlers.saveScore)
+  .openapi(routes.addScore, handlers.addScore)
+  .openapi(routes.resetScore, handlers.resetScore);

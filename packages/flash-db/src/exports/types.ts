@@ -8,6 +8,8 @@ import type {
   createScoreRequestSchema,
   updateScoreRequestSchema,
   updateProfileRequestSchema,
+  addScoreRequestSchema,
+  profileAndScoreSchema,
 } from "./db";
 
 export type Answer = z.infer<typeof selectAnswersSchema>;
@@ -21,3 +23,6 @@ export type UpdateProfile = z.infer<typeof updateProfileRequestSchema>;
 export type Score = z.infer<typeof selectScoresSchema>;
 export type CreateScore = z.infer<typeof createScoreRequestSchema>;
 export type UpdateScore = z.infer<typeof updateScoreRequestSchema>;
+export type AddToScore = z.infer<typeof addScoreRequestSchema>;
+
+export type ResetScore = z.infer<typeof profileAndScoreSchema>;

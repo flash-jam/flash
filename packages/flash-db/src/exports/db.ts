@@ -12,6 +12,7 @@ import type {
   UpdateProfile,
   UpdateScore,
 } from "./types";
+import { z } from "zod";
 
 export function createDb(url: string, authToken?: string) {
   const client = createClient({ url, authToken });
@@ -51,6 +52,14 @@ export const createScoreRequestSchema = insertScoreSchema.omit({
   id: true,
   profileId: true,
 });
+export const addScoreRequestSchema = z.object({
+  toAdd: z.number().int(),
+});
+
+export const profileAndScoreSchema = z.object({
+  profile: selectProfilesSchema,
+  score: selectScoresSchema,
+});
 
 export interface DbConfig {
   createAnswersDbService(): AnswersDbService;
@@ -61,7 +70,7 @@ export interface DbConfig {
 export class LibSqlDbConfig implements DbConfig {
   constructor(
     private url: string,
-    private authToken?: string,
+    private authToken?: string
   ) {}
 
   createAnswersDbService(): AnswersDbService {
@@ -119,7 +128,7 @@ export class AnswersDbService extends DbService {
         : await this.db.query.answers.findMany({
             where: and(
               eq(answers.userId, userId),
-              gt(answers.updatedAt, range),
+              gt(answers.updatedAt, range)
             ),
           });
 
@@ -235,5 +244,14 @@ export class ScoresDbService extends DbService {
     if (score) return score;
 
     return this.createScore(updates, profileId);
+  }
+
+  async addScore(toAdd: number, profileId: number) {
+    const score = await this.getOrCreateScore(profileId);
+
+    return await this.updateOrCreateScore(
+      { score: score.score + toAdd },
+      profileId
+    );
   }
 }

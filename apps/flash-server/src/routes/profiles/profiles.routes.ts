@@ -25,14 +25,14 @@ export const createProfile = createRoute({
   request: {
     body: jsonContentRequired(
       createProfileRequestSchema,
-      "Create Profile request",
+      "Create Profile request"
     ),
   },
   responses: {
     [HTTP.OK]: jsonContent(selectProfilesSchema, "The created profile"),
     [HTTP.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(createProfileRequestSchema),
-      "Errors when creating a profile",
+      "Errors when creating a profile"
     ),
     [HTTP.UNAUTHORIZED]: {
       description: "Unauthorized",
@@ -44,7 +44,7 @@ export type CreateProfileRoute = typeof createProfile;
 
 export const getProfileForUser = createRoute({
   tags,
-  method: "post",
+  method: "get",
   middleware,
   path: "/profiles/foruser",
   responses: {
@@ -67,7 +67,7 @@ export const updateProfile = createRoute({
     params: IdParamsSchema,
     body: jsonContentRequired(
       updateProfileRequestSchema,
-      "Update profile request",
+      "Update profile request"
     ),
   },
   responses: {
@@ -77,7 +77,7 @@ export const updateProfile = createRoute({
         createErrorSchema(IdParamsSchema),
         createErrorSchema(updateProfileRequestSchema),
       ],
-      "Update profile validation errors",
+      "Update profile validation errors"
     ),
     [HTTP.NOT_FOUND]: jsonContent(notFoundSchema, "Profile not found"),
     [HTTP.UNAUTHORIZED]: {

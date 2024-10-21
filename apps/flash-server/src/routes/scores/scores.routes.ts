@@ -2,7 +2,9 @@ import { createRoute } from "@hono/zod-openapi";
 import { auth } from "../../middlewares/auth";
 import { jsonContent, jsonContentRequired } from "stoker/openapi/helpers";
 import {
+  addScoreRequestSchema,
   createScoreRequestSchema,
+  profileAndScoreSchema,
   selectScoresSchema,
   updateScoreRequestSchema,
 } from "@flash/db";
@@ -24,7 +26,7 @@ export const createScore = createRoute({
     [HTTP.OK]: jsonContent(selectScoresSchema, "The created score"),
     [HTTP.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(createScoreRequestSchema),
-      "Invalid create score request",
+      "Invalid create score request"
     ),
   },
 });
@@ -54,14 +56,14 @@ export const saveScore = createRoute({
   request: {
     body: jsonContentRequired(
       updateScoreRequestSchema,
-      "The update score request",
+      "The update score request"
     ),
   },
   responses: {
     [HTTP.OK]: jsonContent(selectScoresSchema, "The updated score"),
     [HTTP.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(updateScoreRequestSchema),
-      "Invalid udpate score request",
+      "Invalid udpate score request"
     ),
     [HTTP.UNAUTHORIZED]: {
       description: "Unauthorized",
@@ -70,3 +72,46 @@ export const saveScore = createRoute({
 });
 
 export type SaveScoreRoute = typeof saveScore;
+
+export const addScore = createRoute({
+  tags,
+  method: "post",
+  middlewares,
+  path: "/scores/add",
+  request: {
+    body: jsonContentRequired(addScoreRequestSchema, "The add score request"),
+  },
+  responses: {
+    [HTTP.OK]: jsonContent(
+      profileAndScoreSchema,
+      "The updated score and profile"
+    ),
+    [HTTP.UNPROCESSABLE_ENTITY]: jsonContent(
+      createErrorSchema(addScoreRequestSchema),
+      "Invalid add score request"
+    ),
+    [HTTP.UNAUTHORIZED]: {
+      description: "Unauthorized",
+    },
+  },
+});
+
+export type AddScoreRoute = typeof addScore;
+
+export const resetScore = createRoute({
+  tags,
+  method: "post",
+  middlewares,
+  path: "/scores/reset",
+  responses: {
+    [HTTP.OK]: jsonContent(
+      profileAndScoreSchema,
+      "The reset score and profile"
+    ),
+    [HTTP.UNAUTHORIZED]: {
+      description: "Unauthorized",
+    },
+  },
+});
+
+export type ResetScoreRoute = typeof resetScore;

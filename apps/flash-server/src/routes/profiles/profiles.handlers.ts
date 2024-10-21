@@ -24,7 +24,7 @@ export const getProfileForUser: AppRouteHandler<
   const { userId } = getValidAuth(c);
   const db = getProfilesDb(c);
 
-  const profile = db.getOrCreateProfile(userId);
+  const profile = await db.getOrCreateProfile(userId);
 
   if (!profile) return c.json({ message: Phrases.NOT_FOUND }, HTTP.NOT_FOUND);
 
