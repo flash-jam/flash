@@ -1,9 +1,10 @@
 import { createClient } from "@libsql/client";
 import { and, desc, eq, gt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/libsql";
-import { answers } from "../schema/answers";
-import type { CreateAnswer } from "./types";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { profiles } from "@/schema/profiles";
+import { answers } from "@/schema/answers";
+import { scores } from "@/schema/scores";
 
 export function createDb(url: string, authToken?: string) {
   const client = createClient({ url, authToken });
@@ -16,11 +17,28 @@ export type Db = ReturnType<typeof createDb>;
 
 export const selectAnswersSchema = createSelectSchema(answers);
 export const insertAnswerSchema = createInsertSchema(answers);
-export const requestsSchema = insertAnswerSchema.omit({
+export const createAnswerRequestSchema = insertAnswerSchema.omit({
   userId: true,
   id: true,
   createdAt: true,
   updatedAt: true,
+});
+
+export const selectProfilesSchema = createSelectSchema(profiles);
+export const insertProfileSchema = createInsertSchema(profiles);
+export const createProfileRequestSchema = insertProfileSchema.omit({
+  userId: true,
+});
+
+export const selectScoresSchema = createSelectSchema(scores);
+export const insertScoreSchema = createInsertSchema(scores);
+export const updateScoreRequestSchema = insertScoreSchema
+  .pick({
+    score: true,
+  })
+  .required();
+export const createScoreRequestSchema = insertScoreSchema.omit({
+  id: true,
 });
 
 export class DbService {
@@ -61,7 +79,7 @@ export class DbService {
         : await this.db.query.answers.findMany({
             where: and(
               eq(answers.userId, userId),
-              gt(answers.updatedAt, range)
+              gt(answers.updatedAt, range),
             ),
           });
 
