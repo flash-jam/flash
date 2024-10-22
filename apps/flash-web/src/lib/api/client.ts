@@ -1,3 +1,7 @@
 import { createClient } from "@flash/server";
 
-export const client = createClient("", { init: { credentials: "include" } });
+const apiBase = import.meta.env.VITE_API_BASE || "";
+console.log("apiBase:", { apiBase });
+export const client = createClient(apiBase, {
+  init: { credentials: "include" },
+});

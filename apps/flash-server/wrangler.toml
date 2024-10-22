@@ -1,9 +1,9 @@
+#:schema node_modules/wrangler/config-schema.json
 name = "flash-jam"
 main = "src/index.ts"
 compatibility_date = "2024-10-18"
-compatibility_flags = [ "nodejs_compat" ]
-
-assets = { directory = "public" }
+compatibility_flags = ["nodejs_compat"]
+keep_vars = true
 
 # [vars]
 # MY_VAR = "my-variable"
