@@ -1,14 +1,14 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 
-import notFound from "stoker/middlewares/not-found";
-
+import { LibSqlDbConfig } from "@flash/db";
 import onError from "stoker/middlewares/on-error";
 import serveEmojiFavicon from "stoker/middlewares/serve-emoji-favicon";
 import defaultHook from "stoker/openapi/default-hook";
-import type { AppBindings, AppOpenAPI } from "./types";
 import { getEnv } from "../env";
 import { pinoLogger } from "../middlewares/pino-logger";
-import { LibSqlDbConfig } from "@flash/db";
+import type { AppBindings, AppOpenAPI } from "./types";
+import { cors } from "hono/cors";
+import { notFound } from "stoker/middlewares";
 
 export function createRouter() {
   return new OpenAPIHono<AppBindings>({
@@ -25,6 +25,16 @@ export default function createApp() {
     await next();
   });
 
+  app.use(pinoLogger());
+
+  app.use((c, next) => {
+    const corsMiddleware = cors({
+      origin: c.env.CORS,
+      credentials: true,
+    });
+    return corsMiddleware(c, next);
+  });
+
   app.use(async (c, next) => {
     c.set(
       "dbConfig",
@@ -35,7 +45,6 @@ export default function createApp() {
   });
 
   app.use(serveEmojiFavicon("⚡"));
-  app.use(pinoLogger());
 
   app.notFound(notFound);
   app.onError(onError);

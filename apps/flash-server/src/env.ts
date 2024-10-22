@@ -12,6 +12,7 @@ const EnvSchema = z
       "trace",
       "silent",
     ]),
+    CORS: z.string(),
     CLERK_PUBLISHABLE_KEY: z.string().min(1),
     CLERK_SECRET_KEY: z.string().min(1),
     DATABASE_URL: z.string().url(),
@@ -36,7 +37,7 @@ export function getEnv(data: any) {
 
   if (error) {
     const errorMessage = `❌ Invalid env: ${Object.entries(
-      error.flatten().fieldErrors
+      error.flatten().fieldErrors,
     )
       .map(([key, errors]) => `${key}: ${errors.join(",")}`)
       .join(" | ")}`;
